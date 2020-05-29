@@ -1,6 +1,7 @@
 
-let request = (req, res) =>{
-    res.send("Hello World");
+let shortenURL = (req, res) =>{
+    path = req.route.path;
+    console.log(path);
 };
 
-module.exports = request;
+module.exports = shortenURL;
