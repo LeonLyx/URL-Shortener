@@ -14,20 +14,16 @@ for (let i = 0; i < characterSet.length; i++){
 
 var mysql = require('mysql');
 var connection = mysql.createConnection({
-    host : "<fill in here>",
-    user : "<fill in here>",
-    password : "<fill in here>",
-    database : "<fill in here>",
+    host : "1234",
+    user : "1234",
+    password : "1234",
+    database : "1234",
 });
 
-console.log(array.length);
 connection.connect();
-
-connection.query('INSERT INTO url_tab (shorten_url) VALUES ?', 
-	[array],
+connection.query('INSERT INTO url_tab (shorten_url) VALUES ?', [array],
     (error, results, fields) =>{
     	console.log(error);
 });
-    
 connection.end();
 
