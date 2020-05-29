@@ -7,11 +7,11 @@ var router = express.Router();
 let endpointList = [
 	{
 		path : "/shorten",
-		method : "GET",
+		method : "POST",
 		handler : require("../controller/shorten_url"),
 	},
 	{
-		path : "/url",
+		path : "/url/:shorten_url",
 		method : "GET",
 		handler : require("../controller/convert_url"),
 	},
