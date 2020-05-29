@@ -7,7 +7,7 @@ for (let i = 0; i < characterSet.length; i++){
     for (let j = 0; j < characterSet.length; j++){
         for (let k = 0; k < characterSet.length; k++){
             urlPath = characterSet[i] + characterSet[j] + characterSet[k];
-            array.push(urlPath);
+            array.push([urlPath]);
         }
     }   
 }
@@ -19,14 +19,15 @@ var connection = mysql.createConnection({
     password : "<fill in here>",
     database : "<fill in here>",
 });
+
+console.log(array.length);
 connection.connect();
 
-array.forEach((shorten_url) =>{
-    connection.query('INSERT INTO url_tab (shorten_url) VALUES (?)', 
-    shorten_url,
-    (error, results, fields) =>{});
+connection.query('INSERT INTO url_tab (shorten_url) VALUES ?', 
+	[array],
+    (error, results, fields) =>{
+    	console.log(error);
 });
-
+    
 connection.end();
-console.log(array.length);
 

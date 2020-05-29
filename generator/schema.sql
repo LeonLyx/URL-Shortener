@@ -2,7 +2,7 @@ CREATE DATABASE url_db;
 USE url_db;
 
 CREATE TABLE url_tab(
-    shorten_url CHAR(3) NOT NULL,
+    shorten_url CHAR(3) BINARY NOT NULL,
     original_url VARCHAR(2048) NULL,
     issue_datetime TIMESTAMP NULL,
 
