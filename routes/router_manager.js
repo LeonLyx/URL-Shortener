@@ -1,5 +1,5 @@
 /*
- * register routers
+ * Register routers here
  */
 let routerList = [
     require('./api'),

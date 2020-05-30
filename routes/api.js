@@ -2,23 +2,23 @@ var express = require('express');
 var router = express.Router();
 
 /**
- * register endpoint
+ * Register endpoints here
  */
 let endpointList = [
 	{
 		path : "/shorten",
 		method : "POST",
-		handler : require("../controller/shorten_url"),
+		handler : require("../controller/get_shorten_url"),
 	},
 	{
 		path : "/url/:shorten_url",
 		method : "GET",
-		handler : require("../controller/convert_url"),
+		handler : require("../controller/get_original_url"),
 	},
 ];
 
 /**
- * configure router
+ * Register router here
  */
 let endpointRouter = {
 	router : router,

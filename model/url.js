@@ -1,7 +1,8 @@
-var pool = require("../db/db_connector");
+var Pool = require("../db/db_connector");
+var Error = require("../lib/error");
 
 /**
- * Queries
+ * Database Queries
  */
 var insertURLQuery = 
 "   UPDATE url_tab \
@@ -21,41 +22,86 @@ var getOriginalURLQuery =
     where shorten_url = ?; \
 "
 
+/**
+ * Finds a shorten URL for a provided URL 
+ * Raises DatabaseError and NoURLAvailableError
+ * Returns the number of changed rows, if there is any
+ */
 var insertURL = (url) =>{
     return new Promise(async (resolve, reject) =>{
-        pool.query(insertURLQuery, url, (error, results, fields) =>{
-            if (error) reject("Failed to make query");
-            resolve(results.changedRows);
+        Pool.query(insertURLQuery, url, (error, results, fields) =>{
+            try{
+                if (error){
+                    throw new Error.DatabaseError();
+                } else if (results.changedRows < 1){
+                    throw new Error.NoURLAvailableError();
+                }
+                resolve(results.changedRows);
+            } catch(exception){
+                reject(exception);
+            }
         });
     });
 };
+
+/**
+ * Retrieves the shorten URL for a given URL
+ * Raises DatabaseError
+ * Returns the shorten_url
+ */
 var getValidShortenURL = (url) =>{
     return new Promise((resolve, reject) =>{
-        pool.query(getValidShortenURLQuery, url, (error, results, fields) =>{
-            if (error) reject("Failed to make query");
-            resolve(results);
+        Pool.query(getValidShortenURLQuery, url, (error, results, fields) =>{
+            try{
+                if (error){
+                    throw new Error.DatabaseError();
+                }
+                (results[0].shorten_url != null) ? resolve(results[0].shorten_url) : resolve(null);
+            } catch(exception){
+                reject(exception);
+            }
         });
     });
 };
 
+/**
+ * Attempts to retrieves the shorten URL for a given URL if it exists.
+ * Otherwise, it will attempt to create a shorten URL for the given URL
+ * Returns the shorten_url
+ */
 module.exports.getShortenURL = (url) =>{
     return new Promise(async (resolve, reject) =>{
-        let shorten_url = await getValidShortenURL(url);
-        if (shorten_url.length > 0) resolve(shorten_url[0])
-        
-        let changedRows = await insertURL(url);
-        if (changedRows < 1) reject("No slots available");
-        
-        shorten_url = await getValidShortenURL(url);
-        resolve(shorten_url[0]);
+        try{
+            let shorten_url = await getValidShortenURL(url);
+            if (shorten_url) return resolve(shorten_url);
+
+            await insertURL(url);            
+            shorten_url = await getValidShortenURL(url);
+            resolve(shorten_url);
+        } catch (exception){
+            reject(exception);
+        }
     });
 };
 
+/**
+ * Attempts to get the original URL, given the shorten URL
+ * Raises DatabaseError, NoMatchingURLError
+ * Returns the original URL
+ */
 module.exports.getOriginalURL = (url) =>{
     return new Promise((resolve, reject) =>{
-        pool.query(getOriginalURLQuery, url, (error, results, fields) =>{
-            if (error) reject("Failed to make query");
-            resolve(results);
+        Pool.query(getOriginalURLQuery, url, (error, results, fields) =>{
+            try{
+                if (error){
+                    throw new Error.DatabaseError();
+                } else if (results[0].original_url == null){
+                    throw new Error.NoMatchingURLError();
+                }
+                resolve(results[0].original_url);
+            } catch(exception){
+                reject(exception);
+            }
         });
     });
 };
